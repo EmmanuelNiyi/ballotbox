@@ -1,0 +1,3 @@
+asgiref @ file:///Users/cbousseau/work/recipes/ci_py311/asgiref_1677957028708/work
+Django @ file:///Users/cbousseau/work/recipes/ci_py311/django_1677970851911/work
+sqlparse @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_16ptvrhamb/croot/sqlparse_1690901943673/work
