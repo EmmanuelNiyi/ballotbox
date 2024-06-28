@@ -1,3 +1,8 @@
-asgiref @ file:///Users/cbousseau/work/recipes/ci_py311/asgiref_1677957028708/work
-Django @ file:///Users/cbousseau/work/recipes/ci_py311/django_1677970851911/work
-sqlparse @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_16ptvrhamb/croot/sqlparse_1690901943673/work
+Django==4.2.1
+asgiref==3.7.2
+sqlparse==0.4.4
+djangorestframework~=3.15.2
+django-rest-swagger==2.2.0
+djangorestframework-simplejwt==5.3.1
+django-environ==0.11.2
+drf-spectacular

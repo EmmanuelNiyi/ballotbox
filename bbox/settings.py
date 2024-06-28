@@ -9,11 +9,28 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+from datetime import timedelta
+from environ import environ
 from pathlib import Path
+
+
+
+environ.Env()
+# reading .env file
+environ.Env.read_env()
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, True)
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+ENV_PATH = f"{BASE_DIR}/keys/.env"
+
+
+# Take environment variables from .env file
+environ.Env.read_env(env_file=ENV_PATH)
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,6 +54,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'drf_spectacular',
+
+    'accounts'
+
 ]
 
 MIDDLEWARE = [
@@ -82,6 +104,39 @@ DATABASES = {
 }
 
 
+# Rest_auth settings
+REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER': 'accounts.serializers.LoginSerializer',
+    'USER_DETAILS_SERIALIZER': 'accounts.serializers.UserDetailsSerializer',
+}
+
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'accounts.serializers.BusinessRegisterSerializer',
+}
+
+REST_FRAMEWORK = {
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Pulsepoint API',
+    'DESCRIPTION': 'Get Ready to CAST YOUR VOTES.',
+    'VERSION': '0.0.1',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
+
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -122,3 +177,41 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+AUTH_USER_MODEL = "accounts.User"
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+
+    'JTI_CLAIM': 'jti',
+
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
