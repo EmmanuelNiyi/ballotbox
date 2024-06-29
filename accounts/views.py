@@ -8,14 +8,16 @@ from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+import logging
 
 from accounts.models import Role, User, UserActivation, UserProfile
 from accounts.serializers import RoleSerializer, UserSerializer, UserActivationSerializer, LoginSerializer, \
     UserProfileSerializer, TailoredUserProfileSerializer
 from accounts.utilities.activation import send_email, generate_activation
 
-
 # Create your views here.
+
+logger = logging.getLogger(__name__)
 
 
 class CreateRoleView(generics.CreateAPIView):
@@ -39,21 +41,22 @@ class UserListView(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            print(serializer.validated_data)
-            serializer.validated_data['password'] = make_password(serializer.validated_data['password'])
-            serializer.validated_data['is_active'] = False
-            serializer.validated_data['is_staff'] = False
-            activation_key = generate_activation()
-            print(activation_key)
-            print(serializer.validated_data)
-            serializer.save()
-            activate = UserActivation.objects.create(user_id=serializer.data['id'], activation_key=activation_key)
-            activate.save()
-            send_email(serializer.data['email'], activation_key)
-            # send_sms(serializer.data['username'], activation_key)
-            serializer.validated_data['password'] = ''
-            print(serializer.validated_data)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            try:
+                serializer.validated_data['password'] = make_password(serializer.validated_data['password'])
+                serializer.validated_data['is_active'] = False
+                serializer.validated_data['is_staff'] = False
+                activation_key = generate_activation()
+                serializer.save()
+                activate = UserActivation.objects.create(user_id=serializer.data['id'], activation_key=activation_key)
+                activate.save()
+                send_email(serializer.data['email'], activation_key)
+                serializer.validated_data['password'] = ''
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                logger.error(f"Error creating user: {e}")
+                return Response({"error": "Error creating user"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            logger.error(f"Invalid data: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -149,5 +152,3 @@ class GetAllUserProfilesView(ListAPIView):
 
     serializer_class = UserProfileSerializer
     queryset = UserProfile.objects.all()
-
-

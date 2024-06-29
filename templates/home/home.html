@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BallotBox - Your Trusted Voting Platform</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>BallotBox</h1>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#login">Login</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="container">
+            <h2>Welcome to BallotBox</h2>
+            <p>Your Trusted Platform for Secure and Transparent Voting.</p>
+            <a href="#features" class="btn">Learn More</a>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="container">
+            <h2>About Us</h2>
+            <p>BallotBox is a state-of-the-art voting application designed to ensure secure, transparent, and accessible elections for everyone. Our mission is to empower communities by providing a reliable platform for democratic processes.</p>
+        </div>
+    </section>
+
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Features</h2>
+            <div class="feature-list">
+                <div class="feature">
+                    <h3>Secure Voting</h3>
+                    <p>Advanced encryption to protect your vote and ensure privacy.</p>
+                </div>
+                <div class="feature">
+                    <h3>Transparent Results</h3>
+                    <p>Real-time updates and results you can trust.</p>
+                </div>
+                <div class="feature">
+                    <h3>Easy Access</h3>
+                    <p>User-friendly interface for seamless voting experience.</p>
+                </div>
+                <div class="feature">
+                    <h3>Multi-Platform Support</h3>
+                    <p>Access BallotBox from any device, anywhere, anytime.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <p>If you have any questions or need assistance, feel free to reach out to us.</p>
+            <form action="contact.php" method="post">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="message">Message:</label>
+                <textarea id="message" name="message" required></textarea>
+
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </section>
+
+    <section id="login" class="login">
+        <div class="container">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <button type="button" onclick="login()">Login</button>
+            </form>
+            <p>Don't have an account? <a href="register.html">Register here</a>.</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 BallotBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('http://127.0.0.1:8000/accounts/api/v1/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('accessToken', data.access);
+                localStorage.setItem('refreshToken', data.refresh);
+                alert('Login successful! Redirecting to dashboard...');
+                window.location.href = 'dashboard.html'; // Redirect to your dashboard page
+            } else {
+                alert('Login failed! Check your username and password.');
+            }
+        }
+    </script>
+</body>
+</html>

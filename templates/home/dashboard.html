@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Welcome to the Dashboard</h1>
+
+    <script>
+        // Check if the user is authenticated
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            alert('You are not logged in! Redirecting to login page...');
+            window.location.href = '/login.html'; // Redirect to your login page
+        } else {
+            // You can add logic here to fetch and display user-specific data from your API
+            alert('Welcome! You are logged in.');
+        }
+    </script>
+</body>
+</html>

@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_spectacular',
+    'corsheaders',
 
     'accounts'
 
@@ -69,7 +70,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+# Allow all origins for development (be more restrictive in production)
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'bbox.urls'
 
@@ -214,4 +220,25 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
     'SLIDING_TOKEN_LIFETIME': timedelta(days=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}
+
+# settings.py
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
 }
