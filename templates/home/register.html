@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>User Registration</h1>
+        </div>
+    </header>
+
+    <section class="registration">
+        <div class="container">
+            <h2>Register New User</h2>
+            <form id="registrationForm">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name" required>
+
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name" required>
+
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="is_staff">Is Staff:</label>
+                <input type="checkbox" id="is_staff" name="is_staff">
+
+                <label for="is_superuser">Is Superuser:</label>
+                <input type="checkbox" id="is_superuser" name="is_superuser">
+
+                <button type="button" onclick="registerUser()">Register</button>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 BallotBox. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        async function registerUser() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const first_name = document.getElementById('first_name').value;
+            const last_name = document.getElementById('last_name').value;
+            const email = document.getElementById('email').value;
+            const is_staff = document.getElementById('is_staff').checked;
+            const is_superuser = document.getElementById('is_superuser').checked;
+
+            const payload = {
+                username,
+                password,
+                first_name,
+                last_name,
+                email,
+                is_staff,
+                is_superuser,
+                roles: [1]  // Assuming roles are fixed for this example
+            };
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/accounts/api/v1/register/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert('User registered successfully! Redirecting to login page.');
+                    window.location.href = 'login.html'; // Redirect to login page
+                } else {
+                    const errorData = await response.json();
+                    alert('Failed to register user: ' + errorData.error);
+                }
+            } catch (error) {
+                console.error('Error registering user:', error);
+                alert('Failed to register user. Please try again later.');
+            }
+        }
+    </script>
+</body>
+</html>

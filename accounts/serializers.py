@@ -2,7 +2,8 @@ from datetime import datetime
 
 from django.conf import settings
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
+from rest_framework.fields import EmailField
+from rest_framework.serializers import ModelSerializer, Serializer
 
 from accounts.models import Role, UserActivation, User, UserProfile
 
@@ -36,11 +37,12 @@ class UserReadSerializer(ModelSerializer):
         fields = ['last_name']
 
 
-class UserActivationSerializer(ModelSerializer):
+class UserActivationSerializer(Serializer):
+    user_email = EmailField()
+    activation_key = serializers.CharField(write_only=True, required=False)
+
     class Meta:
-        model = UserActivation
-        extra_kwargs = {'activation_key': {'write_only': True, 'required': False}}
-        fields = '__all__'
+        fields = ['user_email', 'activation_key']
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
