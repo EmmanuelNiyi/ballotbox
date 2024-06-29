@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Activation</title>
+</head>
+<body>
+    <h2>Send Activation Code</h2>
+    <form id="sendCodeForm">
+        <label for="sendCodeEmail">User Email:</label><br>
+        <input type="email" id="sendCodeEmail" name="user_email" required><br><br>
+
+        <button type="button" onclick="sendActivationCode()">Send Activation Code</button>
+    </form>
+
+    <!-- JavaScript for sending activation code -->
+    <script>
+        async function sendActivationCode() {
+            const user_email = document.getElementById('sendCodeEmail').value;
+
+            const response = await fetch('http://127.0.0.1:8000/accounts/api/v1/send/code/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_email })
+            });
+
+            if (response.ok) {
+                alert('Activation code sent successfully!');
+            } else {
+                alert('Failed to send activation code. Please try again.');
+            }
+        }
+    </script>
+
+    <h2>Activate Account</h2>
+    <form id="activationForm">
+        <label for="activationKey">Activation Key:</label><br>
+        <input type="text" id="activationKey" name="activation_key" required><br><br>
+
+        <label for="userEmail">User Email:</label><br>
+        <input type="email" id="userEmail" name="user_email" value="emmanuelniyioriolowo@gmail.com" required><br><br>
+
+        <button type="button" onclick="activateAccount()">Activate Account</button>
+    </form>
+
+    <!-- JavaScript for account activation -->
+    <script>
+        async function activateAccount() {
+            const activation_key = document.getElementById('activationKey').value;
+            const user_email = document.getElementById('userEmail').value;
+
+            const payload = {
+                activation_key,
+                user_email
+            };
+
+            const response = await fetch('http://127.0.0.1:8000/accounts/api/v1/activate/user/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                alert('Account activated successfully!');
+                // Redirect to login page or dashboard as needed
+                window.location.href = 'login.html';
+            } else {
+                alert('Failed to activate account. Please check your activation key and try again.');
+            }
+        }
+    </script>
+</body>
+</html>
