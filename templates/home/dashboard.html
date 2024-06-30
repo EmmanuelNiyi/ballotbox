@@ -1,21 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .dashboard {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            width: 300px;
+            margin: 0 auto;
+            background-color: #f9f9f9;
+        }
+        .user-details {
+            margin-bottom: 10px;
+        }
+        .user-details label {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to the Dashboard</h1>
+    <div class="dashboard">
+        <h2>User Details</h2>
+        <div class="user-details" id="userDetails">
+            <!-- User details will be dynamically inserted here -->
+        </div>
+    </div>
 
     <script>
-        // Check if the user is authenticated
-        const token = localStorage.getItem('accessToken');
-        if (!token) {
-            alert('You are not logged in! Redirecting to login page...');
-            window.location.href = '/login.html'; // Redirect to your login page
-        } else {
-            // You can add logic here to fetch and display user-specific data from your API
-            alert('Welcome! You are logged in.');
+        // Fetch user details function
+        async function fetchUserDetails() {
+            const accessToken = localStorage.getItem('accessToken');
+            if (!accessToken) {
+                alert('Access token not found. Please log in first.');
+                window.location.href = 'login.html'; // Redirect to login page
+                return;
+            }
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/accounts/api/v1/user/details/', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user details');
+                }
+
+                const userData = await response.json();
+                displayUserDetails(userData);
+            } catch (error) {
+                console.error('Error fetching user details:', error);
+                alert('Failed to fetch user details. Please try again.');
+            }
         }
+
+        // Display user details function
+        function displayUserDetails(userData) {
+            const userDetailsDiv = document.getElementById('userDetails');
+            userDetailsDiv.innerHTML = `
+                <label>ID:</label> ${userData.id}<br>
+                <label>Username:</label> ${userData.username}<br>
+                <label>First Name:</label> ${userData.first_name}<br>
+                <label>Last Name:</label> ${userData.last_name}<br>
+                <label>Email:</label> ${userData.email}<br>
+                <label>Active:</label> ${userData.is_active ? 'Yes' : 'No'}<br>
+                <label>Staff:</label> ${userData.is_staff ? 'Yes' : 'No'}<br>
+                <label>Roles:</label> ${userData.roles.join(', ')}<br>
+            `;
+        }
+
+        // Call fetchUserDetails on page load
+        window.onload = fetchUserDetails;
     </script>
 </body>
 </html>

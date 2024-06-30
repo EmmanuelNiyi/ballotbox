@@ -2,6 +2,9 @@ from django.db import models
 
 from accounts.models import User
 
+import secrets
+import string
+
 
 # Create your models here.
 
@@ -21,12 +24,48 @@ class Election(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     nomination_deadline = models.DateTimeField()
+    registration_type = models.CharField(max_length=10, choices="REGISTRATION_TYPES")
+    unique_code = models.CharField(max_length=6, unique=True)  # Change to CharField for short codes
 
     def __str__(self):
         return self.name
 
     class Meta:
         ordering = ['year', 'name']
+
+    REGISTRATION_TYPES = [
+        ('user', 'User'),
+        ('moderator', 'Moderator'),
+        ('both', 'Both'),
+    ]
+
+    def save(self, *args, **kwargs):
+        if not self.unique_code:
+            self.unique_code = self.generate_unique_code()
+        super().save(*args, **kwargs)
+
+    def generate_unique_code(self):
+        alphabet = string.ascii_letters + string.digits
+        return ''.join(secrets.choice(alphabet) for _ in range(6))
+
+
+class ElectionRegistration(models.Model):
+    election = models.ForeignKey(Election, on_delete=models.CASCADE, related_name='registrations')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='election_registrations')
+    voted = models.BooleanField(default=False)
+    registration_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=10,
+        choices=[('pending', 'Pending'), ('confirmed', 'Confirmed'), ('rejected', 'Rejected')],
+        default='pending'
+    )
+
+    class Meta:
+        unique_together = ('election', 'user')
+        ordering = ['registration_date']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.election.name} ({self.status})"
 
 
 class SubElection(models.Model):
@@ -45,19 +84,22 @@ class SubElection(models.Model):
 
 
 class Candidate(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='candidacies')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='candidacies', null=True, blank=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
     sub_election = models.ForeignKey(SubElection, on_delete=models.CASCADE, related_name='candidates')
     nomination_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.sub_election.name}"
+        if self.user:
+            return f"{self.user.username} - {self.sub_election.name}"
+        return f"{self.name} - {self.sub_election.name}"
 
     @property
     def votes(self):
         return self.votes_set.count()
 
     class Meta:
-        unique_together = ('user', 'sub_election')
+        unique_together = ('user', 'name', 'sub_election')
 
 
 class Vote(models.Model):
