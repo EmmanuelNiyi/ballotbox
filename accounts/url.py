@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from accounts.views import CreateRoleView, GetAllRolesView, UserListView, ActivateView, UserLoginView, \
+from accounts.views import CreateRoleView, GetAllRolesView, CreateUserView, ActivateView, UserLoginView, \
     SendActivationCodeView, UserProfileDetailView, GetAllUserProfilesView, GetUserAccountDetailsView
 
 # urlpatterns = [
@@ -12,7 +12,7 @@ urlpatterns = [
     path('role/create/', CreateRoleView.as_view()),
     path('role/get/all/', GetAllRolesView.as_view()),
 
-    path('register/', UserListView.as_view()),
+    path('register/', CreateUserView.as_view()),
     path('activate/user/', ActivateView.as_view()),
     path('send/code/', SendActivationCodeView.as_view()),
     path('login/', UserLoginView.as_view()),

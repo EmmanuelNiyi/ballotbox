@@ -33,7 +33,7 @@ class GetAllRolesView(ListAPIView):
     queryset = Role.objects.all()
 
 
-class UserListView(generics.ListCreateAPIView):
+class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = [AllowAny, ]
@@ -104,7 +104,7 @@ class SendActivationCodeView(generics.CreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ActivateView(generics.RetrieveAPIView):
+class ActivateView(generics.ListCreateAPIView):
     serializer_class = UserActivationSerializer
     queryset = UserActivation.objects.all()
     permission_classes = [AllowAny]
@@ -113,14 +113,18 @@ class ActivateView(generics.RetrieveAPIView):
 
         serializer = UserActivationSerializer(data=request.data)
         if serializer.is_valid():
-            user = User.objects.filter(email=serializer.validated_data['user_email'])[0]
-            real_code = UserActivation.objects.filter(user_id=user.id,
-                                                      activation_key=serializer.validated_data['activation_key'])
-            if real_code:
-                user.is_active = True
-                user.save()
-                return Response('Activation successful', status=status.HTTP_200_OK)
-            return Response('Activation Failed, check your code', status=status.HTTP_400_BAD_REQUEST)
+            try:
+                user = User.objects.filter(email=serializer.validated_data['user_email'])[0]
+            except IndexError:
+                return Response({"message": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                real_code = UserActivation.objects.filter(user_id=user.id,
+                                                          activation_key=serializer.validated_data['activation_key'])
+                if real_code:
+                    user.is_active = True
+                    user.save()
+                    return Response('Activation successful', status=status.HTTP_200_OK)
+                return Response('Activation Failed, check your code', status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -132,8 +136,11 @@ class UserLoginView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         # Retrieve username and password from request data
-        username = request.data.get('username')
+
+        username = request.data.get('email')
         password = request.data.get('password')
+
+        print(username, password)
 
         # Authenticate user
         user = authenticate(username=username, password=password)

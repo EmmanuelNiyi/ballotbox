@@ -18,14 +18,23 @@ class ElectionType(models.Model):
 
 
 class Election(models.Model):
+
+    REGISTRATION_TYPES = [
+        ('user', 'User'),
+        ('moderator', 'Moderator'),
+        ('both', 'Both'),
+    ]
+
     name = models.CharField(max_length=255)
     type = models.ForeignKey(ElectionType, on_delete=models.CASCADE, related_name='elections')
     year = models.CharField(max_length=4)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     nomination_deadline = models.DateTimeField()
-    registration_type = models.CharField(max_length=10, choices="REGISTRATION_TYPES")
+    registration_type = models.CharField(max_length=10, choices=REGISTRATION_TYPES)
     unique_code = models.CharField(max_length=6, unique=True)  # Change to CharField for short codes
+
+
 
     def __str__(self):
         return self.name
@@ -33,11 +42,7 @@ class Election(models.Model):
     class Meta:
         ordering = ['year', 'name']
 
-    REGISTRATION_TYPES = [
-        ('user', 'User'),
-        ('moderator', 'Moderator'),
-        ('both', 'Both'),
-    ]
+
 
     def save(self, *args, **kwargs):
         if not self.unique_code:
