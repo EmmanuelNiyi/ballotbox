@@ -27,7 +27,7 @@ referencing==0.35.1
 requests==2.32.3
 rpds-py==0.18.1
 simplejson==3.19.2
-sqlparse @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_16ptvrhamb/croot/sqlparse_1690901943673/work
+sqlparse
 uritemplate==4.1.1
 urllib3==2.2.2
 whitenoise==6.7.0
