@@ -38,7 +38,7 @@ SECRET_KEY = 'django-insecure-a-%rc#cbk#dg@630zqo!)7p7n&!%z&x$61htm1ltn-)4^1!*#=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "ballotbox-production.up.railway.app", '127.0.0.1']
 
 # Application definition
 
@@ -108,7 +108,6 @@ DATABASES = {
         'PORT': env('DATABASE_PORT'),
     }
 }
-
 
 # Rest_auth settings
 REST_AUTH_SERIALIZERS = {
@@ -237,4 +236,3 @@ LOGGING = {
         },
     },
 }
-
